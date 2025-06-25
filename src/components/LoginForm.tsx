@@ -30,7 +30,7 @@ const LoginForm: React.FC = () => {
       <div className="bg-white shadow-2xl rounded-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-slate-800 mb-2">
-            ToDoアプリ
+            ラーナーズ・ジム
           </h1>
           <p className="text-slate-600">
             ログインしてタスク管理を始めましょう

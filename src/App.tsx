@@ -141,7 +141,7 @@ const MainApp: React.FC = () => {
         <main className="bg-white shadow-2xl rounded-xl p-6 sm:p-8 mb-6">
           <header className="mb-8 text-center">
             <h1 className="text-4xl sm:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-custom-sky-500 to-custom-amber-400">
-              マイToDoリスト
+              ラーナーズ・ジム
             </h1>
           </header>
 
