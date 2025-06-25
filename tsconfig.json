@@ -10,12 +10,12 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["./**/*.ts", "./**/*.tsx"], // 修正: プロジェクト全体のts/tsxファイルを対象にする
-  "references": [{ "path": "./tsconfig.node.json" }] // tsconfig.node.jsonを参照する場合 (Viteの標準的な設定)
+  "include": ["./*.ts", "./*.tsx", "components/**/*.ts", "components/**/*.tsx"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }
