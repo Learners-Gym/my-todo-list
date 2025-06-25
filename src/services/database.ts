@@ -1,5 +1,5 @@
 import { MockDatabaseService } from './mockDatabase';
-import { googleSheetsService } from './googleSheetsService';
+import { GoogleSheetsService } from './googleSheetsService';
 
 // Export types
 export type { User, TodoRecord } from './mockDatabase';
@@ -18,8 +18,16 @@ if (useGoogleSheets) {
 
 console.log(`Using ${serviceType} database service`);
 
-// Create service instance
-export const databaseService = new MockDatabaseService();
+// Create service instance based on configuration
+let databaseServiceInstance: MockDatabaseService | GoogleSheetsService;
+
+if (serviceType === 'google') {
+  databaseServiceInstance = new GoogleSheetsService();
+} else {
+  databaseServiceInstance = new MockDatabaseService();
+}
+
+export const databaseService = databaseServiceInstance;
 
 // For backwards compatibility
 export class DatabaseService extends MockDatabaseService {}
