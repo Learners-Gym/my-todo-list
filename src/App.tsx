@@ -22,7 +22,7 @@ function AppContent() {
     if (!user) return;
     
     try {
-      const todoRecords = await DatabaseService.getTodos(user.id);
+      const todoRecords = await databaseService.getTodos(user.id);
       const todoList = todoRecords.map((record: TodoRecord) => ({
         id: record.id,
         text: record.text,
@@ -51,7 +51,7 @@ function AppContent() {
     if (!user) return;
     
     try {
-      const newTodo = await DatabaseService.addTodo(user.id, text);
+      const newTodo = await databaseService.createTodo(user.id, text);
       setTodos(prev => [...prev, {
         id: newTodo.id,
         text: newTodo.text,
@@ -68,7 +68,7 @@ function AppContent() {
       const todo = todos.find(t => t.id === id);
       if (!todo) return;
       
-      await DatabaseService.updateTodo(id, { completed: !todo.completed });
+      await databaseService.updateTodo(id, { completed: !todo.completed });
       setTodos(prev => prev.map(t => 
         t.id === id ? { ...t, completed: !t.completed } : t
       ));
@@ -79,7 +79,7 @@ function AppContent() {
 
   const deleteTodo = async (id: string) => {
     try {
-      await DatabaseService.deleteTodo(id);
+      await databaseService.deleteTodo(id);
       setTodos(prev => prev.filter(t => t.id !== id));
     } catch (error) {
       console.error('Error deleting todo:', error);
