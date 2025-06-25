@@ -22,3 +22,5 @@
 +import ToDoList from '../components/ToDoList';
 +import FilterTabs from '../components/FilterTabs';
 +import AppFooter from '../components/AppFooter';
+
+export default AppFooter
