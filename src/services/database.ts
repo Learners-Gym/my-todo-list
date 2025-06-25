@@ -4,7 +4,15 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Only create Supabase client if environment variables are available
+export const supabase = supabaseUrl && supabaseAnonKey 
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null;
+
+// Helper function to check if Supabase is configured
+function isSupabaseConfigured(): boolean {
+  return supabase !== null;
+}
 
 export interface User {
   id: string;
@@ -37,8 +45,13 @@ function verifyPassword(password: string, hash: string): boolean {
 export class DatabaseService {
   // Authentication
   async login(username: string, password: string): Promise<User | null> {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase is not configured. Please connect to Supabase.');
+      return null;
+    }
+
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from('app_users')
         .select('*')
         .eq('username', username)
@@ -68,8 +81,13 @@ export class DatabaseService {
 
   // User management
   async createStudent(username: string, password: string, teacherId: string): Promise<boolean> {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase is not configured. Please connect to Supabase.');
+      return false;
+    }
+
     try {
-      const { error } = await supabase
+      const { error } = await supabase!
         .from('app_users')
         .insert({
           username,
@@ -86,8 +104,13 @@ export class DatabaseService {
   }
 
   async getStudents(teacherId: string): Promise<User[]> {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase is not configured. Please connect to Supabase.');
+      return [];
+    }
+
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from('app_users')
         .select('*')
         .eq('created_by', teacherId)
@@ -114,9 +137,14 @@ export class DatabaseService {
   }
 
   async toggleStudentStatus(studentId: string): Promise<boolean> {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase is not configured. Please connect to Supabase.');
+      return false;
+    }
+
     try {
       // First get current status
-      const { data: currentData, error: fetchError } = await supabase
+      const { data: currentData, error: fetchError } = await supabase!
         .from('app_users')
         .select('active')
         .eq('id', studentId)
@@ -126,7 +154,7 @@ export class DatabaseService {
         return false;
       }
 
-      const { error } = await supabase
+      const { error } = await supabase!
         .from('app_users')
         .update({ active: !currentData.active })
         .eq('id', studentId);
@@ -140,8 +168,13 @@ export class DatabaseService {
 
   // Todo operations
   async getTodos(userId: string): Promise<TodoRecord[]> {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase is not configured. Please connect to Supabase.');
+      return [];
+    }
+
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from('todos')
         .select('*')
         .eq('user_id', userId)
@@ -160,8 +193,13 @@ export class DatabaseService {
   }
 
   async getAllTodosForTeacher(teacherId: string): Promise<TodoRecord[]> {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase is not configured. Please connect to Supabase.');
+      return [];
+    }
+
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from('todos')
         .select(`
           *,
@@ -197,8 +235,13 @@ export class DatabaseService {
   }
 
   async createTodo(userId: string, text: string): Promise<TodoRecord | null> {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase is not configured. Please connect to Supabase.');
+      return null;
+    }
+
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from('todos')
         .insert({
           user_id: userId,
@@ -221,8 +264,13 @@ export class DatabaseService {
   }
 
   async updateTodo(todoId: string, updates: Partial<Pick<TodoRecord, 'text' | 'completed'>>): Promise<boolean> {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase is not configured. Please connect to Supabase.');
+      return false;
+    }
+
     try {
-      const { error } = await supabase
+      const { error } = await supabase!
         .from('todos')
         .update(updates)
         .eq('id', todoId);
@@ -235,8 +283,13 @@ export class DatabaseService {
   }
 
   async deleteTodo(todoId: string): Promise<boolean> {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase is not configured. Please connect to Supabase.');
+      return false;
+    }
+
     try {
-      const { error } = await supabase
+      const { error } = await supabase!
         .from('todos')
         .delete()
         .eq('id', todoId);
@@ -249,8 +302,13 @@ export class DatabaseService {
   }
 
   async clearCompletedTodos(userId: string): Promise<boolean> {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase is not configured. Please connect to Supabase.');
+      return false;
+    }
+
     try {
-      const { error } = await supabase
+      const { error } = await supabase!
         .from('todos')
         .delete()
         .eq('user_id', userId)
@@ -265,6 +323,11 @@ export class DatabaseService {
 
   // Export to Google Sheets format (CSV)
   async exportToCSV(teacherId: string): Promise<string> {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase is not configured. Please connect to Supabase.');
+      return '';
+    }
+
     try {
       const todos = await this.getAllTodosForTeacher(teacherId);
       
