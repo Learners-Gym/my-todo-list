@@ -1,0 +1,5 @@
+{
+  "name": "React Tailwind ToDo アプリ",
+  "description": "React、TypeScript、Tailwind CSSで構築された高機能なToDoアプリケーション。タスク管理、ローカルストレージへの保存、タスクフィルタリング機能を含みます。",
+  "requestFramePermissions": []
+}

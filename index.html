@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToDoアプリ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'custom-sky': {
+              '50': '#f0f9ff',
+              '100': '#e0f2fe',
+              '200': '#bae6fd',
+              '300': '#7dd3fc',
+              '400': '#38bdf8',
+              '500': '#0ea5e9',
+              '600': '#0284c7',
+              '700': '#0369a1',
+              '800': '#075985',
+              '900': '#0c4a6e',
+              '950': '#082f49',
+            },
+            'custom-amber': {
+              '300': '#fcd34d',
+              '400': '#fbbf24',
+              '500': '#f59e0b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- <script type="importmap"> ... </script>  このブロックを削除 -->
+</head>
+<body class="bg-sky-100">
+  <noscript>このアプリを実行するにはJavaScriptを有効にする必要があります。</noscript>
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script> {/* この行は変更なし */}
+</body>
+</html>
