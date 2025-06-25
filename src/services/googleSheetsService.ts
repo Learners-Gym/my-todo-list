@@ -32,7 +32,13 @@ class GoogleSheetsService {
       throw new Error('Google Sheets APIが設定されていません');
     }
 
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${GOOGLE_SHEETS_API_KEY}`;
+    let url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${GOOGLE_SHEETS_API_KEY}`;
+    
+    // For POST requests, use the append endpoint
+    if (method === 'POST') {
+      url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}:append?valueInputOption=RAW&key=${GOOGLE_SHEETS_API_KEY}`;
+    }
+    
     const config: RequestInit = {
       method,
       headers: {
@@ -46,7 +52,9 @@ class GoogleSheetsService {
 
     const response = await fetch(url, config);
     if (!response.ok) {
-      throw new Error(`Google Sheets API error: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('Google Sheets API Error:', response.status, response.statusText, errorText);
+      throw new Error(`Google Sheets API error: ${response.status} ${response.statusText}`);
     }
 
     return response.json();
@@ -79,7 +87,7 @@ class GoogleSheetsService {
       const id = `user_${Date.now()}`;
       const created_at = new Date().toISOString();
       
-      const response = await this.makeRequest('Users!A:F', 'POST', {
+      const response = await this.makeRequest('Users', 'POST', {
         values: [[
           id,
           user.username,
@@ -124,7 +132,7 @@ class GoogleSheetsService {
       const id = `todo_${Date.now()}`;
       const now = new Date().toISOString();
       
-      const response = await this.makeRequest('Todos!A:F', 'POST', {
+      const response = await this.makeRequest('Todos', 'POST', {
         values: [[
           id,
           todo.user_id,
