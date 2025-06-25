@@ -10,6 +10,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+// Utility function to validate UUID format
+function isValidUUID(uuid: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+}
+
 // Types for our database
 export interface User {
   id: string;
@@ -42,8 +48,8 @@ export class SupabaseService {
         .eq('active', true)
         .single();
 
-      // If teacher user doesn't exist and login credentials are correct, create it
-      if ((error || !users) && username === 'teacher' && password === 'teacher123') {
+      // If teacher user doesn't exist or has invalid UUID and login credentials are correct, create it
+      if ((error || !users || (username === 'teacher' && !isValidUUID(users.id))) && username === 'teacher' && password === 'teacher123') {
         const { data: newUser, error: createError } = await supabase
           .from('app_users')
           .insert([
