@@ -71,7 +71,11 @@ export class SupabaseService {
 
         users = newUser;
       } else if (error || !users) {
-        console.error('User not found:', error);
+        if (error) {
+          console.error('Database error during login:', error);
+        } else {
+          console.warn(`Login attempt failed: User not found or inactive for username: ${username}`);
+        }
         return null;
       }
 
