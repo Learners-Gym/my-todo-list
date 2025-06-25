@@ -1,4 +1,10 @@
 // Google Sheets API service
+
+// Generate UUID v4
+function uuidv4(): string {
+  return crypto.randomUUID();
+}
+
 export interface User {
   id: string;
   username: string;
@@ -56,7 +62,7 @@ export class GoogleSheetsService {
 
   private initializeMockData() {
     this.users = [{
-      id: 'teacher_1',
+      id: uuidv4(),
       username: 'teacher',
       role: 'teacher',
       active: true,
@@ -67,7 +73,7 @@ export class GoogleSheetsService {
 
   private async createDefaultTeacher() {
     const defaultTeacher: User = {
-      id: 'teacher_1',
+      id: uuidv4(),
       username: 'teacher',
       role: 'teacher',
       active: true,
@@ -238,7 +244,7 @@ export class GoogleSheetsService {
     }
 
     const newStudent: User = {
-      id: `student_${Date.now()}`,
+      id: uuidv4(),
       username,
       role: 'student',
       created_by: teacherId,

@@ -1,4 +1,10 @@
 // Mock database service for demo purposes
+
+// Generate UUID v4
+function uuidv4(): string {
+  return crypto.randomUUID();
+}
+
 export interface User {
   id: string;
   username: string;
@@ -45,7 +51,7 @@ export class MockDatabaseService {
     } else {
       // Create default teacher account
       this.users = [{
-        id: 'teacher_1',
+        id: uuidv4(),
         username: 'teacher',
         role: 'teacher',
         active: true,
@@ -91,7 +97,7 @@ export class MockDatabaseService {
     }
 
     const newStudent: User = {
-      id: `student_${Date.now()}`,
+      id: uuidv4(),
       username,
       role: 'student',
       created_by: teacherId,
