@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ToDo, FilterStatus } from './types';
-import { DatabaseService, TodoRecord } from './services/database';
+import { DatabaseService, TodoRecord } from './src/services/database';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginForm from './components/LoginForm';
 import UserHeader from './components/UserHeader';
