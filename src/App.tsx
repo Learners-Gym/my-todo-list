@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ToDo, FilterStatus } from '../types';
-import { DatabaseService, TodoRecord } from './services/database';
+import { DatabaseService, TodoRecord, databaseService } from './services/database';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginForm from './components/LoginForm';
 import UserHeader from './components/UserHeader';
 import StudentManagement from './components/StudentManagement';
 import TeacherDashboard from './components/TeacherDashboard';
+import DatabaseStatus from './components/DatabaseStatus';
+import GoogleSheetsSetup from './components/GoogleSheetsSetup';
 import ToDoInput from '../components/ToDoInput';
 import ToDoList from '../components/ToDoList';
 import FilterTabs from '../components/FilterTabs';
@@ -101,6 +103,8 @@ function AppContent() {
     return (
       <div className="min-h-screen bg-gray-50">
         <UserHeader />
+        <DatabaseStatus />
+        <GoogleSheetsSetup />
         <TeacherDashboard />
         <AppFooter />
       </div>
@@ -111,6 +115,7 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-gray-50">
       <UserHeader />
+      <DatabaseStatus />
       
       <main className="max-w-2xl mx-auto py-8 px-4">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">

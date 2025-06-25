@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DatabaseService, User } from '../services/database';
+import { User, databaseService } from '../services/database';
 import { useAuth } from '../context/AuthContext';
 import PlusIcon from '../../components/icons/PlusIcon';
 
@@ -11,7 +11,6 @@ const StudentManagement: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const { user } = useAuth();
-  const databaseService = new DatabaseService();
 
   useEffect(() => {
     if (user && user.role === 'teacher') {
