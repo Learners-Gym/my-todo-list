@@ -25,10 +25,35 @@ student1,サンプルタスク2,true,2024-01-01T00:00:00.000Z,2024-01-01T00:00:0
 
       {showInstructions && (
         <div className="space-y-6">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <h3 className="font-semibold text-red-800 mb-2">⚠️ 重要な制限事項</h3>
+            <div className="text-sm text-red-700 space-y-2">
+              <p>
+                <strong>Google Sheets API キーは読み取り専用です。</strong>
+                データの書き込み（作成・更新・削除）には、OAuth2認証またはサービスアカウント認証が必要です。
+              </p>
+              <p>
+                現在の設定では、Google Sheetsからデータを読み込むことはできますが、
+                新しいデータの保存はローカルのみとなります。
+              </p>
+              <p>
+                完全なGoogle Sheets連携が必要な場合は、
+                <a href="https://developers.google.com/sheets/api/guides/authorizing" target="_blank" rel="noopener noreferrer" className="text-red-600 hover:underline font-medium">
+                  OAuth2認証の実装
+                </a>
+                または
+                <a href="https://developers.google.com/sheets/api/guides/concepts#service_account" target="_blank" rel="noopener noreferrer" className="text-red-600 hover:underline font-medium">
+                  サービスアカウント
+                </a>
+                を検討してください。
+              </p>
+            </div>
+          </div>
+
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <h3 className="font-semibold text-yellow-800 mb-2">📝 手順概要</h3>
             <ol className="list-decimal list-inside text-sm text-yellow-700 space-y-1">
-              <li>Google Sheetsで新しいスプレッドシートを作成</li>
+              <li>Google Sheetsで新しいスプレッドシートを作成（読み取り専用）</li>
               <li>必要なシートとヘッダーを設定</li>
               <li>Google Cloud PlatformでAPIキーを取得</li>
               <li>環境変数を設定してアプリを再起動</li>
@@ -107,6 +132,12 @@ student1,サンプルタスク2,true,2024-01-01T00:00:00.000Z,2024-01-01T00:00:0
             <div>
               <h3 className="font-semibold text-slate-800 mb-2">3. Google Cloud Platform設定</h3>
               <div className="bg-slate-50 rounded-lg p-4">
+                <div className="bg-blue-50 border border-blue-200 rounded p-3 mb-3">
+                  <p className="text-sm text-blue-700">
+                    <strong>注意:</strong> APIキーでは読み取り専用アクセスのみ可能です。
+                    書き込み操作には追加の認証設定が必要です。
+                  </p>
+                </div>
                 <ol className="list-decimal list-inside text-sm text-slate-600 space-y-2">
                   <li>
                     <a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
@@ -154,10 +185,20 @@ student1,サンプルタスク2,true,2024-01-01T00:00:00.000Z,2024-01-01T00:00:0
 
           <div className="bg-green-50 border border-green-200 rounded-lg p-4">
             <h3 className="font-semibold text-green-800 mb-2">✅ 設定完了後</h3>
-            <p className="text-sm text-green-700">
+            <div className="text-sm text-green-700 space-y-2">
+              <p>
               すべての設定が完了すると、アプリケーションが自動的にGoogle Sheetsに接続され、
-              データがスプレッドシートに保存されるようになります。
-            </p>
+                <strong>既存のデータを読み込む</strong>ことができます。
+              </p>
+              <p>
+                新しいデータの作成・更新は現在ローカルのみで動作し、
+                ページをリロードすると失われます。
+              </p>
+              <p>
+                データの永続化が必要な場合は、Supabaseなどの
+                クライアントサイド対応データベースの使用を検討してください。
+              </p>
+            </div>
           </div>
         </div>
       )}

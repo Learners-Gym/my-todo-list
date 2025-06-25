@@ -93,6 +93,11 @@ export class GoogleSheetsService {
       throw new Error('Google Sheets APIが設定されていません');
     }
 
+    // API keys only support read-only operations
+    if (method !== 'GET') {
+      throw new Error('Google Sheets API keyは読み取り専用です。書き込み操作にはOAuth2またはサービスアカウント認証が必要です。');
+    }
+
     let url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${GOOGLE_SHEETS_API_KEY}`;
     
     if (method === 'POST') {
@@ -182,8 +187,8 @@ export class GoogleSheetsService {
         ]]
       });
     } catch (error) {
-      console.error('Failed to add user to Google Sheets:', error);
-      throw error;
+      console.warn('Google Sheets書き込みはサポートされていません。ローカルデータを使用します。:', error);
+      // Don't throw error, just log and continue with local data
     }
   }
 
@@ -200,8 +205,8 @@ export class GoogleSheetsService {
         ]]
       });
     } catch (error) {
-      console.error('Failed to add todo to Google Sheets:', error);
-      throw error;
+      console.warn('Google Sheets書き込みはサポートされていません。ローカルデータを使用します。:', error);
+      // Don't throw error, just log and continue with local data
     }
   }
 
