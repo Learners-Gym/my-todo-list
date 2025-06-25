@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { DatabaseService, User } from '../services/database';
+import { databaseService, User } from '../services/database';
 
 interface AuthContextType {
   user: User | null;
@@ -25,7 +25,6 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const databaseService = new DatabaseService();
 
   useEffect(() => {
     // Check if user is logged in (stored in localStorage)
