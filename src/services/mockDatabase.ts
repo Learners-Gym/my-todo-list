@@ -137,7 +137,7 @@ export class MockDatabaseService {
 
   async createTodo(userId: string, text: string): Promise<TodoRecord | null> {
     const newTodo: TodoRecord = {
-      id: `todo_${Date.now()}`,
+      id: uuidv4(),
       user_id: userId,
       text,
       completed: false,

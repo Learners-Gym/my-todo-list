@@ -306,7 +306,7 @@ export class GoogleSheetsService {
     await this.initializeData();
     
     const newTodo: TodoRecord = {
-      id: `todo_${Date.now()}`,
+      id: uuidv4(),
       user_id: userId,
       text,
       completed: false,

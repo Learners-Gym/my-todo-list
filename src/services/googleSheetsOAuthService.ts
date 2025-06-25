@@ -1,4 +1,5 @@
 // Enhanced Google Sheets Service with OAuth2 support
+import { v4 as uuidv4 } from 'uuid';
 import { googleOAuthService } from './googleOAuthService';
 
 export interface User {
@@ -58,7 +59,7 @@ export class GoogleSheetsOAuthService {
 
   private initializeMockData() {
     this.users = [{
-      id: 'teacher_1',
+      id: uuidv4(),
       username: 'teacher',
       role: 'teacher',
       active: true,
@@ -69,7 +70,7 @@ export class GoogleSheetsOAuthService {
 
   private async createDefaultTeacher() {
     const defaultTeacher: User = {
-      id: 'teacher_1',
+      id: uuidv4(),
       username: 'teacher',
       role: 'teacher',
       active: true,
@@ -255,7 +256,7 @@ export class GoogleSheetsOAuthService {
     }
 
     const newStudent: User = {
-      id: `student_${Date.now()}`,
+      id: uuidv4(),
       username,
       role: 'student',
       created_by: teacherId,
@@ -320,7 +321,7 @@ export class GoogleSheetsOAuthService {
     await this.initializeData();
     
     const newTodo: TodoRecord = {
-      id: `todo_${Date.now()}`,
+      id: uuidv4(),
       user_id: userId,
       text,
       completed: false,
