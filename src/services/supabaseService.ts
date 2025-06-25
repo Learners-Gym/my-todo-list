@@ -46,7 +46,7 @@ export class SupabaseService {
         .select('*')
         .eq('username', username)
         .eq('active', true)
-        .single();
+        .maybeSingle();
 
       // If teacher user doesn't exist or has invalid UUID and login credentials are correct, create it
       if ((error || !users || (username === 'teacher' && !isValidUUID(users.id))) && username === 'teacher' && password === 'teacher123') {
