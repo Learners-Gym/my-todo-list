@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ToDo, FilterStatus } from '../types';
-import { DatabaseService, TodoRecord, databaseService } from './services/database';
+import { TodoRecord, databaseService } from './services/database';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginForm from './components/LoginForm';
 import UserHeader from './components/UserHeader';
@@ -13,83 +13,191 @@ import ToDoList from '../components/ToDoList';
 import FilterTabs from '../components/FilterTabs';
 import AppFooter from '../components/AppFooter';
 
-function AppContent() {
-  const { user, isLoading } = useAuth();
-  const [todos, setTodos] = useState<ToDo[]>([]);
-  const [filter, setFilter] = useState<FilterStatus>('all');
+const MainApp: React.FC = () => {
+  const [todos, setTodos] = useState<TodoRecord[]>([]);
+  const [filter, setFilter] = useState<FilterStatus>(FilterStatus.ALL);
+  const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
 
-  const loadTodos = useCallback(async () => {
-    if (!user) return;
-    
-    try {
-      const todoRecords = await databaseService.getTodos(user.id);
-      const todoList = todoRecords.map((record: TodoRecord) => ({
-        id: record.id,
-        text: record.text,
-        completed: record.completed,
-        userId: record.user_id
-      }));
-      setTodos(todoList);
-    } catch (error) {
-      console.error('Error loading todos:', error);
+  useEffect(() => {
+    if (user) {
+      loadTodos();
     }
   }, [user]);
 
-  useEffect(() => {
-    loadTodos();
-  }, [loadTodos]);
+  const loadTodos = async () => {
+    if (!user) return;
+    
+    setIsLoading(true);
+    try {
+      const userTodos = await databaseService.getTodos(user.id);
+      setTodos(userTodos);
+    } catch (error) {
+      console.error('Failed to load todos:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddTodo = useCallback(async (text: string) => {
+    if (!user) return;
+
+    try {
+      const newTodo = await databaseService.createTodo(user.id, text);
+      if (newTodo) {
+        setTodos((prevTodos) => [newTodo, ...prevTodos]);
+      }
+    } catch (error) {
+      console.error('Failed to add todo:', error);
+    }
+  }, [user]);
+
+  const handleToggleTodo = useCallback(async (id: string) => {
+    const todo = todos.find(t => t.id === id);
+    if (!todo) return;
+
+    const success = await databaseService.updateTodo(id, { completed: !todo.completed });
+    if (success) {
+      setTodos((prevTodos) =>
+        prevTodos.map((todo) =>
+          todo.id === id ? { ...todo, completed: !todo.completed } : todo
+        )
+      );
+    }
+  }, [todos]);
+
+  const handleDeleteTodo = useCallback(async (id: string) => {
+    const success = await databaseService.deleteTodo(id);
+    if (success) {
+      setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+    }
+  }, []);
+
+  const handleSetFilter = useCallback((newFilter: FilterStatus) => {
+    setFilter(newFilter);
+  }, []);
+
+  const handleClearCompleted = useCallback(async () => {
+    if (!user) return;
+
+    const success = await databaseService.clearCompletedTodos(user.id);
+    if (success) {
+      setTodos((prevTodos) => prevTodos.filter((todo) => !todo.completed));
+    }
+  }, [user]);
 
   const filteredTodos = useMemo(() => {
-    return todos.filter(todo => {
-      if (filter === 'active') return !todo.completed;
-      if (filter === 'completed') return todo.completed;
-      return true;
+    return todos.filter((todo) => {
+      if (filter === FilterStatus.ACTIVE) return !todo.completed;
+      if (filter === FilterStatus.COMPLETED) return todo.completed;
+      return true; // FilterStatus.ALL
     });
   }, [todos, filter]);
 
-  const addTodo = async (text: string) => {
-    if (!user) return;
-    
-    try {
-      const newTodo = await databaseService.createTodo(user.id, text);
-      setTodos(prev => [...prev, {
-        id: newTodo.id,
-        text: newTodo.text,
-        completed: newTodo.completed,
-        userId: newTodo.user_id
-      }]);
-    } catch (error) {
-      console.error('Error adding todo:', error);
-    }
-  };
+  const activeTodosCount = useMemo(() => {
+    return todos.filter(todo => !todo.completed).length;
+  }, [todos]);
 
-  const toggleTodo = async (id: string) => {
-    try {
-      const todo = todos.find(t => t.id === id);
-      if (!todo) return;
+  // Convert TodoRecord to ToDo for compatibility with existing components
+  const convertedTodos: ToDo[] = filteredTodos.map(todo => ({
+    id: todo.id,
+    text: todo.text,
+    completed: todo.completed,
+    createdAt: new Date(todo.created_at).getTime(),
+  }));
+
+  return (
+    <div className="min-h-screen text-slate-700 flex flex-col items-center pt-8 sm:pt-12 md:pt-16 px-4 selection:bg-custom-amber-400 selection:text-slate-800">
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #cbd5e1; /* slate-300 */
+          border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #94a3b8; /* slate-400 */
+        }
+      `}</style>
       
-      await databaseService.updateTodo(id, { completed: !todo.completed });
-      setTodos(prev => prev.map(t => 
-        t.id === id ? { ...t, completed: !t.completed } : t
-      ));
-    } catch (error) {
-      console.error('Error updating todo:', error);
-    }
-  };
+      <div className="w-full max-w-4xl">
+        <UserHeader />
+        <DatabaseStatus />
 
-  const deleteTodo = async (id: string) => {
-    try {
-      await databaseService.deleteTodo(id);
-      setTodos(prev => prev.filter(t => t.id !== id));
-    } catch (error) {
-      console.error('Error deleting todo:', error);
-    }
-  };
+        {user?.role === 'teacher' && (
+          <>
+            <GoogleSheetsSetup />
+            <StudentManagement />
+            <TeacherDashboard />
+          </>
+        )}
+
+        <main className="bg-white shadow-2xl rounded-xl p-6 sm:p-8 mb-6">
+          <header className="mb-8 text-center">
+            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-custom-sky-500 to-custom-amber-400">
+              マイToDoリスト
+            </h1>
+          </header>
+
+          <ToDoInput onAddTodo={handleAddTodo} />
+          
+          <FilterTabs currentFilter={filter} onSetFilter={handleSetFilter} />
+
+          {isLoading ? (
+            <div className="text-center py-8">
+              <div className="inline-block w-6 h-6 border-2 border-custom-sky-500 border-t-transparent rounded-full animate-spin"></div>
+              <p className="mt-2 text-slate-600">読み込み中...</p>
+            </div>
+          ) : (
+            <ToDoList
+              todos={convertedTodos}
+              filter={filter}
+              onToggleTodo={handleToggleTodo}
+              onDeleteTodo={handleDeleteTodo}
+            />
+          )}
+
+          {todos.length > 0 && (
+            <div className="mt-6 pt-4 border-t border-slate-300 flex flex-col sm:flex-row justify-between items-center text-sm text-slate-500 gap-2">
+              <span>残り {activeTodosCount} 件</span>
+              <button
+                onClick={handleClearCompleted}
+                className="hover:text-custom-sky-600 transition-colors px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-custom-sky-500 focus:ring-offset-2 focus:ring-offset-white"
+              >
+                完了済みをクリア
+              </button>
+            </div>
+          )}
+        </main>
+      </div>
+      
+      <AppFooter />
+    </div>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+};
+
+const AppContent: React.FC = () => {
+  const { user, isLoading } = useAuth();
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-br from-sky-100 to-blue-200 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-custom-sky-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-600">読み込み中...</p>
+        </div>
       </div>
     );
   }
@@ -98,56 +206,7 @@ function AppContent() {
     return <LoginForm />;
   }
 
-  // Check user role and render appropriate dashboard
-  if (user.user_metadata?.role === 'teacher') {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <UserHeader />
-        <DatabaseStatus />
-        <GoogleSheetsSetup />
-        <TeacherDashboard />
-        <AppFooter />
-      </div>
-    );
-  }
-
-  // Default student view with todo functionality
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <UserHeader />
-      <DatabaseStatus />
-      
-      <main className="max-w-2xl mx-auto py-8 px-4">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="p-6 border-b border-gray-200">
-            <h1 className="text-2xl font-bold text-gray-900 mb-6">My Tasks</h1>
-            <ToDoInput onAdd={addTodo} />
-          </div>
-          
-          <div className="p-6">
-            <FilterTabs currentFilter={filter} onFilterChange={setFilter} />
-            <ToDoList 
-              todos={filteredTodos}
-              onToggle={toggleTodo}
-              onDelete={deleteTodo}
-            />
-          </div>
-        </div>
-
-        {user.user_metadata?.role === 'student' && <StudentManagement />}
-      </main>
-      
-      <AppFooter />
-    </div>
-  );
-}
-
-function App() {
-  return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
-  );
-}
+  return <MainApp />;
+};
 
 export default App;
