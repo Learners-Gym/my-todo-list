@@ -1,6 +1,7 @@
 import { MockDatabaseService } from './mockDatabase';
 import { GoogleSheetsService } from './googleSheetsService';
 import { GoogleSheetsOAuthService } from './googleSheetsOAuthService';
+import { SupabaseService } from './supabaseService';
 
 // Export types
 export type { User, TodoRecord } from './mockDatabase';
@@ -12,20 +13,22 @@ const useSupabase = !!(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE
 
 let serviceType: 'mock' | 'google' | 'google-oauth' | 'supabase' = 'mock';
 
-if (useGoogleOAuth) {
+if (useSupabase) {
+  serviceType = 'supabase';
+} else if (useGoogleOAuth) {
   serviceType = 'google-oauth';
 } else if (useGoogleSheets) {
   serviceType = 'google';
-} else if (useSupabase) {
-  serviceType = 'supabase';
 }
 
 console.log(`Using ${serviceType} database service`);
 
 // Create service instance based on configuration
-let databaseServiceInstance: MockDatabaseService | GoogleSheetsService | GoogleSheetsOAuthService;
+let databaseServiceInstance: MockDatabaseService | GoogleSheetsService | GoogleSheetsOAuthService | SupabaseService;
 
-if (serviceType === 'google-oauth') {
+if (serviceType === 'supabase') {
+  databaseServiceInstance = new SupabaseService();
+} else if (serviceType === 'google-oauth') {
   databaseServiceInstance = new GoogleSheetsOAuthService();
 } else if (serviceType === 'google') {
   databaseServiceInstance = new GoogleSheetsService();
