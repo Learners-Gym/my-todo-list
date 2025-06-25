@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { v4 as uuidv4 } from 'uuid';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -33,15 +34,37 @@ export class SupabaseService {
   // Authentication
   async login(username: string, password: string): Promise<User | null> {
     try {
-      // For demo purposes, we'll check against the app_users table
-      const { data: users, error } = await supabase
+      // Check if user exists in the app_users table
+      let { data: users, error } = await supabase
         .from('app_users')
         .select('*')
         .eq('username', username)
         .eq('active', true)
         .single();
 
-      if (error || !users) {
+      // If teacher user doesn't exist and login credentials are correct, create it
+      if ((error || !users) && username === 'teacher' && password === 'teacher123') {
+        const { data: newUser, error: createError } = await supabase
+          .from('app_users')
+          .insert([
+            {
+              id: uuidv4(),
+              username: 'teacher',
+              password_hash: 'demo_hash',
+              role: 'teacher',
+              active: true,
+            },
+          ])
+          .select()
+          .single();
+
+        if (createError) {
+          console.error('Failed to create teacher user:', createError);
+          return null;
+        }
+
+        users = newUser;
+      } else if (error || !users) {
         console.error('User not found:', error);
         return null;
       }
