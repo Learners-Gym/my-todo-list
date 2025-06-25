@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DatabaseService, TodoRecord } from '../services/database';
 import { useAuth } from '../context/AuthContext';
-import { FilterStatus } from '../types';
+import { FilterStatus } from '../../types';
 
 const TeacherDashboard: React.FC = () => {
   const [allTodos, setAllTodos] = useState<TodoRecord[]>([]);
