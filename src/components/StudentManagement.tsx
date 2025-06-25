@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DatabaseService, User } from '../services/database';
 import { useAuth } from '../context/AuthContext';
-import PlusIcon from './icons/PlusIcon';
+import PlusIcon from '../../components/icons/PlusIcon';
 
 const StudentManagement: React.FC = () => {
   const [students, setStudents] = useState<User[]>([]);
