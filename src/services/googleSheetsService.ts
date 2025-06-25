@@ -32,11 +32,10 @@ class GoogleSheetsService {
       throw new Error('Google Sheets APIが設定されていません');
     }
 
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${GOOGLE_SHEETS_API_KEY}`;
     const config: RequestInit = {
       method,
       headers: {
-        'Authorization': `Bearer ${GOOGLE_SHEETS_API_KEY}`,
         'Content-Type': 'application/json',
       },
     };
@@ -45,7 +44,7 @@ class GoogleSheetsService {
       config.body = JSON.stringify(data);
     }
 
-    const response = await fetch(`${url}?key=${GOOGLE_SHEETS_API_KEY}`, config);
+    const response = await fetch(url, config);
     if (!response.ok) {
       throw new Error(`Google Sheets API error: ${response.statusText}`);
     }
