@@ -8,6 +8,7 @@ import StudentManagement from './components/StudentManagement';
 import TeacherDashboard from './components/TeacherDashboard';
 import DatabaseStatus from './components/DatabaseStatus';
 import GoogleSheetsSetup from './components/GoogleSheetsSetup';
+import OAuth2Setup from './components/OAuth2Setup';
 import ToDoInput from '../components/ToDoInput';
 import ToDoList from '../components/ToDoList';
 import FilterTabs from '../components/FilterTabs';
@@ -130,6 +131,7 @@ const MainApp: React.FC = () => {
 
         {user?.role === 'teacher' && (
           <>
+            <OAuth2Setup onAuthSuccess={loadTodos} />
             <GoogleSheetsSetup />
             <StudentManagement />
             <TeacherDashboard />
